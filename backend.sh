@@ -205,8 +205,7 @@ read -p "Veuillez entrer le nom de l'application Django : " app_name
 # Création de l'application Django
 python manage.py startapp $app_name
 
-# Installation de django-bootstrap-v5
-pip install django-bootstrap-v5
+
 
 # Obtenez le chemin complet du fichier settings.py
 settings_file="$project_name/settings.py"
@@ -399,5 +398,10 @@ pip install django-seed
 python run_seed.py
 fi
 
+# Installation de django-bootstrap-v5
+pip install django-bootstrap-v5
+
+python manage.py makemigrations
+python manage.py migrate
 # Lancement du serveur Django
 python manage.py runserver
