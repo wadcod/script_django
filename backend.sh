@@ -249,7 +249,7 @@ body {
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     background-color: #4A968C;
     color: #F5CB45;
     font-size: 50px;
