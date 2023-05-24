@@ -325,7 +325,7 @@ EOF
 # fichier urls
 urls="$project_name/urls.py"
     rm -rf $urls
-    touch -p "$urls"
+    touch "$urls"
     cat <<EOF > $urls
 """
 URL configuration for azz project.
@@ -367,7 +367,7 @@ if [ "$install_seed" == "y" ]; then
     export DJANGO_SETTINGS_MODULE=$project_name.settings
 
     seed="$app_name/seed.py"
-    touch -p "$seed"
+    touch "$seed"
     cat <<EOF > $seed
 # from django_seed import Seed    
 # from $app_name.models import Member
