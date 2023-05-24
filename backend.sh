@@ -251,7 +251,7 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #4A968C;
-    color: F5CB45;
+    color: #F5CB45;
     font-size: 50px;
     text-shadow: 2px 2px 4px rgb(255, 0, 0);
 }
