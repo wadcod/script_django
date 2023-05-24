@@ -250,8 +250,8 @@ body {
     justify-content: space-around;
     align-items: center;
     height: 100vh;
-    background-color: rgb(42, 137, 200);
-    color: pink;
+    background-color: #4A968C;
+    color: F5CB45;
     font-size: 50px;
     text-shadow: 2px 2px 4px rgb(255, 0, 0);
 }
