@@ -395,6 +395,7 @@ if __name__== '__main__':
     run()
 EOF
 pip install django-seed
+pip install psycopg2
 python run_seed.py
 fi
 
