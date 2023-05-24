@@ -369,20 +369,20 @@ if [ "$install_seed" == "y" ]; then
     seed="$app_name/seed.py"
     touch -p "$seed"
     cat <<EOF > $seed
-    # from django_seed import Seed    
-    # from restaurantly_app.models import Member
-    # import random
+# from django_seed import Seed    
+# from $app_name.models import Member
+# import random
 
-    # def run():
-    #     seeder = Seed.seeder()
-    #     genders = ['male','female','autre']
-    #     seeder.add_entity(Member, 60, {
-    #         'age' : lambda x: random.randint(0,100),
-    #         'name' : lambda x: seeder.faker.name(),
-    #         'gender' : lambda x: genders[random.randint(0,2)],
-    #     })
-    #     inserted_pks = seeder.execute()
-    #     print(inserted_pks)
+# def run():
+#     seeder = Seed.seeder()
+#     genders = ['male','female','autre']
+#     seeder.add_entity(Member, 60, {
+#         'age' : lambda x: random.randint(0,100),
+#         'name' : lambda x: seeder.faker.name(),
+#         'gender' : lambda x: genders[random.randint(0,2)],
+#     })
+#     inserted_pks = seeder.execute()
+#     print(inserted_pks)
 EOF
     touch "run_seed.py"
     cat <<EOF > run_seed.py
