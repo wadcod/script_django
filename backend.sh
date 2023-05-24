@@ -1,6 +1,6 @@
 #!/bin/bash
 
-read -p "Veuillez entrer le nom du fichier : " fichier_name
+read -p "Veuillez entrer le nom du dossier : " fichier_name
 mkdir $fichier_name
 cd $fichier_name
 
