@@ -254,7 +254,7 @@ body {
     color: #F5CB45;
     font-size: 50px;
     text-shadow: 3px 3px 3px rgb(255, 0, 0), 3px 3px 3px rgb(247, 0, 255);
-    background-image: linear-gradient(#964a7f45, #964a8d39), url('https://wallpapercave.com/wp/wp4092768.jpg');
+    background-image: linear-gradient(#4a968cc1, #4a968ce1), url('https://wallpapercave.com/wp/wp4092768.jpg');
     background-attachment: fixed;
     background-position: top;
     background-repeat: no-repeat;
