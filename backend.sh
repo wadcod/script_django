@@ -318,6 +318,7 @@ cat <<EOF > $home_html_file
     <p><i><b> <a href="https://wallpapercave.com/wp/wp4092746.jpg" target="_blank">&copy; WADCORP </a></b></i> </p>
     <p><i><b> <a href="https://wallpapercave.com/wp/wp4092767.png" target="_blank">&copy; KWISSYCORP </a></b></i> </p>
     <p><i><b> <a href="https://wallpapercave.com/wp/7zHcRhs.jpg" target="_blank">&copy; JEREMCORP </a></b></i> </p>
+    <p><i><b> <a href="https://wallpapercave.com/wp/wp3948114.jpg" target="_blank">&copy; LECHESHIRECORP (MAC) </a></b></i> </p>
 
 {% endblock content %} 
 EOF
