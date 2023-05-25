@@ -254,6 +254,11 @@ body {
     color: #F5CB45;
     font-size: 50px;
     text-shadow: 2px 2px 4px rgb(255, 0, 0);
+    background-image: linear-gradient(#4a968c45, #4a967b39), url('../img/QDB.png');
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 EOF
 
