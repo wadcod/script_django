@@ -253,12 +253,13 @@ body {
     background-color: #4A968C;
     color: #F5CB45;
     font-size: 50px;
-    text-shadow: 2px 2px 4px rgb(255, 0, 0);
-    background-image: linear-gradient(#4a968c45, #4a967b39), url('../img/QDB.png');
+    text-shadow: 3px 3px 3px rgb(255, 0, 0), 3px 3px 3px rgb(247, 0, 255);
+    background-image: linear-gradient(#964a7f45, #964a8d39), url('https://wallpapercave.com/wp/wp4092768.jpg');
     background-attachment: fixed;
-    background-position: center;
+    background-position: top;
     background-repeat: no-repeat;
-    background-size: contain;
+    background-size: cover;
+    object-fit: cover;
 }
 EOF
 
