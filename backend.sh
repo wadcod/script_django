@@ -3,7 +3,7 @@
 read -p "Veuillez entrer le nom du dossier : " fichier_name
 mkdir $fichier_name
 cd $fichier_name
-
+deactivate
 # création gitignore
 touch .gitignore
 cat <<EOF > .gitignore
