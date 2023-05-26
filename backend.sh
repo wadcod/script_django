@@ -416,5 +416,8 @@ pip install django-bootstrap-v5
 
 python manage.py makemigrations
 python manage.py migrate
+cd ../ 
+pip freeze > requirements.txt
+cd ./$project_name
 # Lancement du serveur Django
 python manage.py runserver
