@@ -4,6 +4,11 @@ read -p "Veuillez entrer le nom du dossier : " fichier_name
 mkdir $fichier_name
 cd $fichier_name
 deactivate
+# Demande à l'utilisateur s'il souhaite installer MySQL
+read -p "Souhaitez-vous installer MySQL (y/n)? " install_mysql
+
+read -p "Souhaitez-vous installer seed (y/n)? " install_seed
+
 # création gitignore
 touch .gitignore
 cat <<EOF > .gitignore
@@ -366,14 +371,13 @@ urlpatterns = [
 EOF
 
 
-# Demande à l'utilisateur s'il souhaite installer MySQL
-read -p "Souhaitez-vous installer MySQL (y/n)? " install_mysql
+
 
 if [ "$install_mysql" == "y" ]; then
     # Installation de mysqlclient
     pip install mysqlclient
 fi
-read -p "Souhaitez-vous installer seed (y/n)? " install_seed
+
 
 if [ "$install_seed" == "y" ]; then
     export DJANGO_SETTINGS_MODULE=$project_name.settings
