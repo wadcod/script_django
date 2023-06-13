@@ -9,6 +9,12 @@ read -p "Souhaitez-vous installer MySQL (y/n)? " install_mysql
 
 read -p "Souhaitez-vous installer seed (y/n)? " install_seed
 
+# Demande à l'utilisateur de saisir le nom du projet Django
+read -p "Veuillez entrer le nom du projet Django : " project_name
+
+# Demande à l'utilisateur de saisir le nom de l'application Django
+read -p "Veuillez entrer le nom de l'application Django : " app_name
+
 # création gitignore
 touch .gitignore
 cat <<EOF > .gitignore
@@ -199,15 +205,13 @@ python.exe -m pip install --upgrade pip
 # Installation de Django et sauvegarde des dépendances dans requirements.txt
 pip install django
 
-# Demande à l'utilisateur de saisir le nom du projet Django
-read -p "Veuillez entrer le nom du projet Django : " project_name
+
 
 # Création du projet Django
 django-admin startproject $project_name
 cd $project_name
 
-# Demande à l'utilisateur de saisir le nom de l'application Django
-read -p "Veuillez entrer le nom de l'application Django : " app_name
+
 
 # Création de l'application Django
 python manage.py startapp $app_name
@@ -315,18 +319,21 @@ cat <<EOF > $base_html_file
 </html>
 EOF
 
-# Créer le fichier home.html
-home_html_file="$app_templates_directory/home.html"
-touch "$home_html_file"
-cat <<EOF > $home_html_file
+# Créer le fichier index.html
+index_html_file="$app_templates_directory/index.html"
+touch "$index_html_file"
+cat <<EOF > $index_html_file
 {% extends "base.html" %}
 {% block content %}
     <h1>Home</h1>
     <p><i><b> <a href="https://wallpapercave.com/wp/wp4092746.jpg" target="_blank">&copy; WADCORP </a></b></i> </p>
     <p><i><b> <a href="https://wallpapercave.com/wp/wp4092767.png" target="_blank">&copy; KWISSYCORP </a></b></i> </p>
-    <p><i><b> <a href="https://wallpapercave.com/wp/7zHcRhs.jpg" target="_blank">&copy; JEREMCORP </a></b></i> </p>
+    <p><i><b> <a href="https://wallpapercave.com/wp/7zHcRhs.jpg" target="_blank">&copy; JIHEFELCORP </a></b></i> </p>
     <p><i><b> <a href="https://wallpapercave.com/wp/wp3948114.jpg" target="_blank">&copy; LECHESHIRECORP (MAC) </a></b></i> </p>
     <p><i><b> <a href="https://pbs.twimg.com/media/EyhJuqFWUAE4KFs?format=jpg&name=900x900" target="_blank">&copy; MOHACORP </a></b></i> </p>
+    <p><i><b> <a href="https://wallpapercave.com/dwp2x/wp10583826.jpg" target="_blank">&copy; NICORP </a></b></i> </p>
+    <p><i><b> <a href="https://image.insider.com/5abb9e6a3216741c008b462d?width=600&format=jpeg&auto=webp" target="_blank">&copy; RYADCORP (MAC) </a></b></i> </p>
+
 {% endblock content %} 
 EOF
 
@@ -336,8 +343,8 @@ views="$app_name/views.py"
 from django.shortcuts import render
 
 # Create your views here.
-def home(request):
-    return render(request, '$app_name/home.html')
+def index(request):
+    return render(request, '$app_name/index.html')
 EOF
 
 
@@ -368,7 +375,7 @@ from $app_name import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home),
+    path('', views.index ,name='index'),
 ]
 EOF
 
