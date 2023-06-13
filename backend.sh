@@ -193,9 +193,11 @@ EOF
 python -m venv env
 source env/Scripts/activate
 
+# MàJ de Pip
+python.exe -m pip install --upgrade pip
+
 # Installation de Django et sauvegarde des dépendances dans requirements.txt
 pip install django
-pip freeze > requirements.txt
 
 # Demande à l'utilisateur de saisir le nom du projet Django
 read -p "Veuillez entrer le nom du projet Django : " project_name
@@ -417,6 +419,9 @@ fi
 
 # Installation de django-bootstrap-v5
 pip install django-bootstrap-v5
+
+# Installation de Pillow
+python -m pip install Pillow
 
 python manage.py makemigrations
 python manage.py migrate
