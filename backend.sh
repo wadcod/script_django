@@ -556,7 +556,7 @@ if [ "$install_seed" == "y" ]; then
 # from $app_name.models import Pays, President
 # import random
 
-def run():
+# def run():
 #     seeder = Seed.seeder()
     
 #     # Seed pour le modèle Pays
