@@ -224,6 +224,10 @@ settings_file="$project_name/settings.py"
 # Obtenez le nom du répertoire de l'application (nom de l'application en minuscules)
 app_directory="$(echo "$app_name" | tr '[:upper:]' '[:lower:]')"
 
+# Ajouter "import os" à la ligne 14 du fichier settings.py
+sed -i "14i\\
+import os" "$settings_file"
+
 # Ajouter le nom de l'application à la ligne 40 du fichier settings.py
 sed -i "40i\\
     '$app_directory'," "$settings_file"
@@ -240,6 +244,10 @@ echo "" >> "$settings_file"
 echo "STATICFILES_DIRS = [" >> "$settings_file"
 echo "$static_dir" >> "$settings_file"
 echo "]" >> "$settings_file"
+echo "MEDIA_URL = '/media/'" >> "$settings_file"
+echo "MEDIA_ROOT = os.path.join(BASE_DIR, 'media')" >> "$settings_file"
+
+
 
 mkdir -p "$app_name/static/$app_name/css" "$app_name/static/$app_name/img" "$app_name/static/$app_name/js"
 fichier_css="$app_name/static/$app_name/css/style.css"
@@ -277,6 +285,30 @@ a{
     color: inherit;
     font-weight: inherit;
 }
+
+.inputform{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: cneter;
+    flex-wrap: wrap;
+}
+.inputbtn{
+    outline: none;
+    border: none;
+    font-weight: bold;
+
+}
+
+.inputbtn:hover {
+    color: rgb(255, 255, 255);    
+    background-color: rgb(7, 155, 155);
+}
+.inputform label{
+    display: flex;
+    flex-direction: column;
+}
+
 EOF
 
 # Créer le répertoire "templates" s'il n'existe pas déjà
@@ -325,26 +357,150 @@ touch "$index_html_file"
 cat <<EOF > $index_html_file
 {% extends "base.html" %}
 {% block content %}
-    <h1>Home</h1>
-    <p><i><b> <a href="https://wallpapercave.com/wp/wp4092746.jpg" target="_blank">&copy; WADCORP </a></b></i> </p>
+
+<p><i><b> <a href="https://wallpapercave.com/wp/wp4092746.jpg" target="_blank">&copy; WADCORP </a></b></i> </p>
     <p><i><b> <a href="https://wallpapercave.com/wp/wp4092767.png" target="_blank">&copy; KWISSYCORP </a></b></i> </p>
     <p><i><b> <a href="https://wallpapercave.com/wp/7zHcRhs.jpg" target="_blank">&copy; JIHEFELCORP </a></b></i> </p>
     <p><i><b> <a href="https://wallpapercave.com/wp/wp3948114.jpg" target="_blank">&copy; LECHESHIRECORP (MAC) </a></b></i> </p>
     <p><i><b> <a href="https://pbs.twimg.com/media/EyhJuqFWUAE4KFs?format=jpg&name=900x900" target="_blank">&copy; MOHACORP </a></b></i> </p>
-    <p><i><b> <a href="https://wallpapercave.com/dwp2x/wp10583826.jpg" target="_blank">&copy; NICORP </a></b></i> </p>
-    <p><i><b> <a href="https://image.insider.com/5abb9e6a3216741c008b462d?width=600&format=jpeg&auto=webp" target="_blank">&copy; RYADCORP (MAC) </a></b></i> </p>
+    <p><i><b> <a href="https://wallpapercave.com/dwp2x/wp10583826.jpg" target="_blank">&copy; NICORP (MAC)</a></b></i> </p>
+    <p><i><b> <a href="https://ih1.redbubble.net/image.2281622048.4930/bg,f8f8f8-flat,750x,075,f-pad,750x1000,f8f8f8.jpg" target="_blank">&copy; RYADCORP</a></b></i> </p>
+    <p><i><b> <a href="https://i.ytimg.com/vi/jcPrnWNX3Ck/maxresdefault.jpg" target="_blank">&copy; SOUFCORP</a></b></i> </p>
 
+    
+    <!-- pays -->
+    <h1>CRUD Pays</h1>
+    <div class="allForm">
+        <form method="post" class="inputform">
+            {% csrf_token %}
+            {{ pays_form.as_p }}
+            <button class="inputbtn" type="submit">Ajouter</button>
+        </form>
+    </div>
+    <ul>
+    {% for p in pays %}
+        <li>{{ p.nom }} - Population : {{ p.population }}</li>
+    {% empty %}
+        <li>Aucun pays enregistré.</li>
+    {% endfor %}
+    </ul>
+
+
+<br>
+<!-- president -->
+    <h1>CRUD Président</h1>
+    <div class="allForm">
+        <form class="inputform" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ president_form.as_p }}
+        <button class="inputbtn" type="submit">Ajouter</button>
+        </form>
+    </div>
+    
+    <ul>
+    {% for p in presidents %}
+    <li>
+        <img src="{{ p.image.url }}" alt="" class="w-25 mt-5 {% if p.genre == 'M' %}
+        border border-5 border-danger
+        {% elif p.genre == 'F' %}
+        border border-5 border-primary
+        {% else %}
+        border rounded-circle {{p.genre}}
+        {% endif %}">
+        {{ p.nom }} - {{ p.pays.nom }} - Age : {{ p.age }} - Genre : {{p.genre}}</li>
+    {% empty %}
+        <li>Aucun président enregistré.</li>
+    {% endfor %}
+    </ul>
+
+    
 {% endblock content %} 
+
 EOF
 
 # fichier views
 views="$app_name/views.py"
     cat <<EOF > $views
 from django.shortcuts import render
+from django.shortcuts import render, redirect
+from .models import Pays, President
+from .forms import PaysForm, PresidentForm
 
-# Create your views here.
+
 def index(request):
-    return render(request, '$app_name/index.html')
+    if request.method == 'POST':
+        pays_form = PaysForm(request.POST)
+        president_form = PresidentForm(request.POST, request.FILES)
+
+        if pays_form.is_valid():
+            pays_form.save()
+            return redirect('index')
+
+        if president_form.is_valid():
+            president_form.save()
+            return redirect('index')
+    else:
+        pays_form = PaysForm()
+        president_form = PresidentForm()
+
+    pays = Pays.objects.all()
+    presidents = President.objects.all()
+    context = {
+        'pays_form': pays_form,
+        'president_form': president_form,
+        'pays': pays,
+        'presidents': presidents
+    }
+    return render(request, '$app_name/index.html', context)
+
+EOF
+# fichier forms
+forms="$app_name/forms.py"
+    cat <<EOF > $forms
+from django import forms
+from .models import Pays, President
+
+class PaysForm(forms.ModelForm):
+    class Meta:
+        model = Pays
+        fields = ('nom', 'population')
+
+
+class PresidentForm(forms.ModelForm):
+    class Meta:
+        model = President
+        fields = ('nom', 'age', 'image', 'genre', 'pays')
+
+EOF
+
+
+# fichier models
+models="$app_name/models.py"
+    cat <<EOF > $models
+from django.db import models
+
+class Pays(models.Model):
+    nom = models.CharField(max_length=255)
+    population = models.IntegerField()
+
+    def __str__(self):
+        return self.nom
+
+
+class President(models.Model):
+    GENRE_CHOICES = (
+        ('M', 'Homme'),
+        ('F', 'Femme'),
+    )
+
+    nom = models.CharField(max_length=255)
+    age = models.IntegerField()
+    image = models.ImageField(upload_to='presidents/')
+    genre = models.CharField(max_length=1, choices=GENRE_CHOICES)
+    pays = models.ForeignKey(Pays, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.nom
 EOF
 
 
@@ -371,14 +527,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from $app_name import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index ,name='index'),
-]
-EOF
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+EOF
 
 
 
@@ -395,17 +553,26 @@ if [ "$install_seed" == "y" ]; then
     touch "$seed"
     cat <<EOF > $seed
 # from django_seed import Seed    
-# from $app_name.models import Member
+# from $app_name.models import Pays, President
 # import random
 
-# def run():
+def run():
 #     seeder = Seed.seeder()
-#     genders = ['male','female','autre']
-#     seeder.add_entity(Member, 60, {
-#         'age' : lambda x: random.randint(0,100),
-#         'name' : lambda x: seeder.faker.name(),
-#         'gender' : lambda x: genders[random.randint(0,2)],
+    
+#     # Seed pour le modèle Pays
+#     seeder.add_entity(Pays, 5, {
+#         'nom': lambda x: seeder.faker.country(),
+#         'population': lambda x: seeder.faker.random_int(min=1000, max=1000000)
 #     })
+
+#     # Seed pour le modèle President
+#     seeder.add_entity(President, 5, {
+#         'nom': lambda x: seeder.faker.name(),
+#         'age': lambda x: seeder.faker.random_int(min=30, max=80),
+#         'genre': lambda x: seeder.faker.random_element(['M', 'F']),
+#         'pays': lambda x: seeder.faker.random_element(Pays.objects.all())
+#     })
+
 #     inserted_pks = seeder.execute()
 #     print(inserted_pks)
 EOF
