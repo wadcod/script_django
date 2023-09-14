@@ -3,11 +3,18 @@
 read -p "Veuillez entrer le nom du dossier : " fichier_name
 mkdir $fichier_name
 cd $fichier_name
-deactivate
+
 # Demande à l'utilisateur s'il souhaite installer MySQL
 read -p "Souhaitez-vous installer MySQL (y/n)? " install_mysql
 
 read -p "Souhaitez-vous installer seed (y/n)? " install_seed
+
+if [[ "$install_seed" = "y" ]]; then
+    read -p "Voulez-vous utiliser seed avec la méthode apprise à Molengeek(1) ou la méthode officielle Django(2) ?" method_seed
+    while [[ $method_seed != 1 && $method_seed != 2 ]]; do
+        read -p "Voulez-vous utiliser seed avec la méthode apprise à Molengeek(1) ou la méthode officielle Django(2) ?" method_seed
+    done
+fi
 
 # Demande à l'utilisateur de saisir le nom du projet Django
 read -p "Veuillez entrer le nom du projet Django : " project_name
@@ -205,7 +212,11 @@ python.exe -m pip install --upgrade pip
 # Installation de Django et sauvegarde des dépendances dans requirements.txt
 pip install django
 
+# Installation de django-bootstrap-v5
+pip install django-bootstrap-v5
 
+# Installation de Pillow
+python -m pip install Pillow
 
 # Création du projet Django
 django-admin startproject $project_name
@@ -366,53 +377,6 @@ cat <<EOF > $index_html_file
     <p><i><b> <a href="https://wallpapercave.com/dwp2x/wp10583826.jpg" target="_blank">&copy; NICORP (MAC)</a></b></i> </p>
     <p><i><b> <a href="https://ih1.redbubble.net/image.2281622048.4930/bg,f8f8f8-flat,750x,075,f-pad,750x1000,f8f8f8.jpg" target="_blank">&copy; RYADCORP</a></b></i> </p>
     <p><i><b> <a href="https://i.ytimg.com/vi/jcPrnWNX3Ck/maxresdefault.jpg" target="_blank">&copy; SOUFCORP</a></b></i> </p>
-
-    
-    <!-- pays -->
-    <h1>CRUD Pays</h1>
-    <div class="allForm">
-        <form method="post" class="inputform">
-            {% csrf_token %}
-            {{ pays_form.as_p }}
-            <button class="inputbtn" type="submit">Ajouter</button>
-        </form>
-    </div>
-    <ul>
-    {% for p in pays %}
-        <li>{{ p.nom }} - Population : {{ p.population }}</li>
-    {% empty %}
-        <li>Aucun pays enregistré.</li>
-    {% endfor %}
-    </ul>
-
-
-<br>
-<!-- president -->
-    <h1>CRUD Président</h1>
-    <div class="allForm">
-        <form class="inputform" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ president_form.as_p }}
-        <button class="inputbtn" type="submit">Ajouter</button>
-        </form>
-    </div>
-    
-    <ul>
-    {% for p in presidents %}
-    <li>
-        <img src="{{ p.image.url }}" alt="" class="w-25 mt-5 {% if p.genre == 'M' %}
-        border border-5 border-danger
-        {% elif p.genre == 'F' %}
-        border border-5 border-primary
-        {% else %}
-        border rounded-circle {{p.genre}}
-        {% endif %}">
-        {{ p.nom }} - {{ p.pays.nom }} - Age : {{ p.age }} - Genre : {{p.genre}}</li>
-    {% empty %}
-        <li>Aucun président enregistré.</li>
-    {% endfor %}
-    </ul>
-
     
 {% endblock content %} 
 
@@ -423,34 +387,11 @@ views="$app_name/views.py"
     cat <<EOF > $views
 from django.shortcuts import render
 from django.shortcuts import render, redirect
-from .models import Pays, President
-from .forms import PaysForm, PresidentForm
 
 
-def index(request):
-    if request.method == 'POST':
-        pays_form = PaysForm(request.POST)
-        president_form = PresidentForm(request.POST, request.FILES)
-
-        if pays_form.is_valid():
-            pays_form.save()
-            return redirect('index')
-
-        if president_form.is_valid():
-            president_form.save()
-            return redirect('index')
-    else:
-        pays_form = PaysForm()
-        president_form = PresidentForm()
-
-    pays = Pays.objects.all()
-    presidents = President.objects.all()
-    context = {
-        'pays_form': pays_form,
-        'president_form': president_form,
-        'pays': pays,
-        'presidents': presidents
-    }
+def home(request):
+    
+    context = locals()
     return render(request, '$app_name/index.html', context)
 
 EOF
@@ -498,7 +439,7 @@ class President(models.Model):
     image = models.ImageField(upload_to='presidents/')
     genre = models.CharField(max_length=1, choices=GENRE_CHOICES)
     pays = models.ForeignKey(Pays, on_delete=models.CASCADE)
-
+    
     def __str__(self):
         return self.nom
 EOF
@@ -533,51 +474,56 @@ from $app_name import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index ,name='index'),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('', views.home ,name='home'),
+]
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 EOF
 
 
 
-if [ "$install_mysql" == "y" ]; then
+if [[ "$install_mysql" == "y" ]]; then
     # Installation de mysqlclient
     pip install mysqlclient
 fi
 
+if [[ $install_seed == "y" ]]; then
+    pip install django-seed
+    pip install psycopg2
 
-if [ "$install_seed" == "y" ]; then
-    export DJANGO_SETTINGS_MODULE=$project_name.settings
+    # -------------------------------- SEED METHODE MOLENGEEK --------------------------------
+    if [[ $method_seed == 1 ]]; then
+        
+        seed="$app_name/seed.py"
+        touch "$seed"
+        cat <<EOF > $seed
+from django_seed import Seed    
+from $app_name.models import Pays, President
+import random
 
-    seed="$app_name/seed.py"
-    touch "$seed"
-    cat <<EOF > $seed
-# from django_seed import Seed    
-# from $app_name.models import Pays, President
-# import random
-
-# def run():
-#     seeder = Seed.seeder()
+def run():
+    seeder = Seed.seeder()
     
-#     # Seed pour le modèle Pays
-#     seeder.add_entity(Pays, 5, {
-#         'nom': lambda x: seeder.faker.country(),
-#         'population': lambda x: seeder.faker.random_int(min=1000, max=1000000)
-#     })
+    # Seed pour le modèle Pays
+    seeder.add_entity(Pays, 5, {
+        'nom': lambda x: seeder.faker.country(),
+        'population': lambda x: seeder.faker.random_int(min=1000, max=1000000)
+    })
 
-#     # Seed pour le modèle President
-#     seeder.add_entity(President, 5, {
-#         'nom': lambda x: seeder.faker.name(),
-#         'age': lambda x: seeder.faker.random_int(min=30, max=80),
-#         'genre': lambda x: seeder.faker.random_element(['M', 'F']),
-#         'pays': lambda x: seeder.faker.random_element(Pays.objects.all())
-#     })
+    # Seed pour le modèle President
+    seeder.add_entity(President, 5, {
+        'nom': lambda x: seeder.faker.name(),
+        'age': lambda x: seeder.faker.random_int(min=30, max=80),
+        'genre': lambda x: seeder.faker.random_element(['M', 'F']),
+        'pays': lambda x: seeder.faker.random_element(Pays.objects.all())
+    })
 
-#     inserted_pks = seeder.execute()
-#     print(inserted_pks)
+    inserted_pks = seeder.execute()
+    print(inserted_pks)
 EOF
-    touch "run_seed.py"
-    cat <<EOF > run_seed.py
+        touch "run_seed.py"
+        cat <<EOF > run_seed.py
 import django
 django.setup()
 
@@ -586,21 +532,59 @@ from $app_name.seed import run
 if __name__== '__main__':
     run()
 EOF
-pip install django-seed
-pip install psycopg2
-python run_seed.py
+        python manage.py makemigrations
+        python manage.py migrate
+        export DJANGO_SETTINGS_MODULE=$project_name.settings
+        python run_seed.py
+
+    # -------------------------------- SEED METHODE PRO --------------------------------
+    elif [[ $method_seed == 2 ]]; then
+        mkdir -p $app_name/management/commands/
+        touch $app_name/management/commands/seed.py
+
+        cat <<EOF > $app_name/management/commands/seed.py
+from django.core.management.base import BaseCommand
+from django_seed import Seed
+from website.models import Pays, President
+
+class Command(BaseCommand):
+    help = 'Remplir la db avec des données issues du seed'
+
+    def handle(self, *args, **kwargs):
+        seeder = Seed.seeder()
+    
+        # Seed pour le modèle Pays
+        seeder.add_entity(Pays, 5, {
+            'nom': lambda x: seeder.faker.country(),
+            'population': lambda x: seeder.faker.random_int(min=1000, max=1000000)
+        })
+
+        # Seed pour le modèle President
+        seeder.add_entity(President, 5, {
+            'nom': lambda x: seeder.faker.name(),
+            'age': lambda x: seeder.faker.random_int(min=30, max=80),
+            'genre': lambda x: seeder.faker.random_element(['M', 'F']),
+            'pays': lambda x: seeder.faker.random_element(Pays.objects.all())
+        })
+
+        inserted_pks = seeder.execute()
+
+        self.stdout.write(self.style.SUCCESS(f'Data inserted: {inserted_pks}'))
+EOF
+        python manage.py makemigrations
+        python manage.py migrate
+        python manage.py seed
+    fi
 fi
 
-# Installation de django-bootstrap-v5
-pip install django-bootstrap-v5
 
-# Installation de Pillow
-python -m pip install Pillow
-
+# Migrations
 python manage.py makemigrations
 python manage.py migrate
+
 cd ../ 
 pip freeze > requirements.txt
+source env/Scripts/activate
 cd ./$project_name
 # Lancement du serveur Django
 python manage.py runserver
